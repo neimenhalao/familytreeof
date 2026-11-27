@@ -26,7 +26,8 @@ Brukes av COO-ens daglige økt. Hold dokumentet oppdatert – det er hukommelsen
 | `tools/build.mjs` | Bygger `dist/`: forside, trær, personsider, søker, parsider, sitemap, robots, IndexNow-liste |
 | `site/js/tree.js` | Interaktivt tre (zoom/panorering/knip, sammenlegging, søk, detaljark, fullskjerm) |
 | `site/js/kin.js` | Slektskapsberegning (delt av nettleseren og bygget) |
-| `site/js/finder.js` | Slektskapssøkeren |
+| `site/js/finder.js` | Slektskapssøkeren (`/how-are-they-related/`) |
+| `site/js/maker.js` | Tre-makeren (`/make-your-own-family-tree/`); blanke maler bygges i `build.mjs` (`blankPedigree`) |
 | `data/slugs.json` | **Stabile URL-er per person. Ikke slett** – nye personer får nye slugger, gamle endres aldri |
 | `data/excluded-living.txt` | Levende personer med Wikipedia-artikkel som er utelatt (til manuell vurdering) |
 
@@ -56,6 +57,7 @@ git add -A && git commit -m "…" && git push               # publiserer
 6. **Rapport til COO** (kort, norsk): tall, hva som ble gjort, neste steg, og bare om det trengs: hva eieren må gjøre.
 
 ## Status
+- 2026-11-27 (kveld, daglig økt): Helse grønn. GoatCounter 13 besøk (nesten bare egen testing), Search Console «processing». **Tre-maker v1 publisert:** `/make-your-own-family-tree/` (ane-tavle 3/4/5 generasjoner, localStorage, utskrift/PDF, hendelse `event-maker-print`) og utskriftbare maler `/family-tree-template/` + `3-generations/`, `4-generations/`, `5-generations/`. Lenket fra meny, bunntekst og forside. Rapport: `rapporter/2026-11-27.md`.
 - 2026-11-27 (ettermiddag): **LANSERT på https://familytreeof.com.** Domenet er kjøpt, og COO har lagt inn DNS hos Domeneshop (4× A + www CNAME). Pages custom domain er satt, `SITE_DOMAIN=familytreeof.com` og `GOATCOUNTER=familytreeof` er satt, og `NOINDEX` er slettet. HTTPS-sertifikatet er godkjent og HTTPS er tvunget. www og http sender videre til https://familytreeof.com/, canonical er riktig og det er ingen noindex. IndexNow svarte 200 for 4 188 adresser. Første forsøk ga 403 fordi sertifikatet ikke var klart; ved 403 er løsningen å kjøre indexnow-jobben på nytt. Faktasjekken av introene er fullført (danske konger, Kennedy-barna, Louis XV/Philip V, Harrison 1841 og Barbara Bush er bekreftet; «Frederick IX» er endret til «Frederik IX»). Search Console håndteres av COO.
 - 2026-11-27: **MVP live på github.io med NOINDEX.** 26 trær (kongehus i dag, dynastier, antikken, mytologi, amerikanske familier), 7 613 personsider (4 054 indekserbare, resten `noindex`), 103 «How are X and Y related?»-sider, søkergraf med 11 613 personer, 3 875 portretter med fri lisens og 124 levende personer utelatt etter regelen. Data hentet 2026-11-27 (14 235 Wikidata-entiteter, ca. 470 SPARQL-spørringer totalt). Bygget tar ca. 4 min lokalt (OneDrive-I/O), under 1 min i Actions. Testet i nettleser på mobil (375 px) og desktop. Venter på at eieren kjøper familytreeof.com og lager GoatCounter-kontoen.
 - Kjente svakheter: mytologitrærne er brede og rotete fordi Wikidata har mange varianter (Zeus har mange partnere). Slektskap utenfor trærne kan mangle fordi grafen bare har trærne + nærmeste familie, så det kan stå «not related by blood» der et fjernt blodsslektskap finnes. Grafen (`data/graph.json`) er ca. 1 MB ukomprimert og lastes først når søkeren tas i bruk. Ved lansering: sett `SITE_DOMAIN`, legg til custom domain i Pages, sett DNS, fjern `NOINDEX`, legg sitemap inn i Search Console, sjekk at IndexNow svarer 200/202.
@@ -66,7 +68,7 @@ git add -A && git commit -m "…" && git push               # publiserer
 3. Eier: lager GoatCounter-kontoen `familytreeof` og bekrefter Search Console. Claude legger inn sitemap og ber om indeksering av forsiden og de 10 største trærne.
 
 ## Vekstbacklogg (prioritert)
-1. **«Make your own family tree» (gratis tre-maker)** – høyest prioritet etter lansering. «family tree template» ca. 60k og «family tree maker free» store søk. Nettleserbasert, data i localStorage, utskrift og PDF, maler (3/4/5 generasjoner) og utskriftbare blanke maler (statiske sider = egne søkeord). Gir gjenbesøk og grunnlag for betalt eksport.
+1. **Tre-maker v2** (v1 publisert 2026-11-27: ane-tavle 3/4/5 gen., localStorage, utskrift/PDF, blanke maler 3/4/5). Neste: eksport/import (JSON-fil) så data ikke forsvinner, etterkommer-/familievisning (søsken, barn, ektefeller), flere malsider for egne søkeord («family tree for kids», «family tree with siblings», «blank family tree printable», «family tree worksheet»), fargevalg. Senere: betalt høyoppløst plakat-eksport. Følg `event-maker-print` i GoatCounter.
 2. **Flere trær med høy etterspørsel:** Egyptiske faraoer (flere dynastier), Spanish/Dutch/Belgian royal family, Windsor-detaljside «Charles III family tree», Japanese imperial family, Mughal, Ottoman dynasty, Kennedy-utvidelse, Lincoln, Washington, Jefferson-Hemings (forsiktig, kildebasert), Shakespeare, Bach-familien, Rothschild, Targaryen-lignende fiktive? (nei – opphavsrett), bibelske slektstrær (nøkternt, senere).
 3. **Personnavn-sider for kjente enkeltpersoner:** «Henry VIII family tree», «Queen Elizabeth II family tree» osv. som egne tre-sider (ancestors + descendants rundt én person). Stor lang hale.
 4. **Ancestor-visning (anetavle)** i tillegg til etterkommertre – «Charles III ancestry», «Prince George family tree».

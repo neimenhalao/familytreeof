@@ -233,11 +233,11 @@ ${GOAT ? `<script data-goatcounter="https://${GOAT}.goatcounter.com/count" async
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="brand" href="${u('/')}">${LOGO}<span class="wm">FamilyTree<b>Of</b></span></a>
-<nav aria-label="Main"><a href="${u('/trees/')}"${nav === 'trees' ? ' aria-current="page"' : ''}>Trees</a><a href="${u('/how-are-they-related/')}"${nav === 'rel' ? ' aria-current="page"' : ''}>How related?</a><a class="hide-s" href="${u('/about/')}"${nav === 'about' ? ' aria-current="page"' : ''}>About</a></nav>
+<nav aria-label="Main"><a href="${u('/trees/')}"${nav === 'trees' ? ' aria-current="page"' : ''}>Trees</a><a href="${u('/how-are-they-related/')}"${nav === 'rel' ? ' aria-current="page"' : ''}>How related?</a><a href="${u('/make-your-own-family-tree/')}"${nav === 'maker' ? ' aria-current="page"' : ''}>Make yours</a><a class="hide-s" href="${u('/about/')}"${nav === 'about' ? ' aria-current="page"' : ''}>About</a></nav>
 </div></header>
 <main id="main">${body}</main>
 <footer class="bottom"><div class="wrap">
-<nav aria-label="Footer"><a href="${u('/trees/')}">All family trees</a><a href="${u('/how-are-they-related/')}">How are they related?</a><a href="${u('/about/')}">About &amp; sources</a><a href="${u('/privacy/')}">Privacy</a></nav>
+<nav aria-label="Footer"><a href="${u('/trees/')}">All family trees</a><a href="${u('/how-are-they-related/')}">How are they related?</a><a href="${u('/make-your-own-family-tree/')}">Make your own family tree</a><a href="${u('/family-tree-template/')}">Printable templates</a><a href="${u('/about/')}">About &amp; sources</a><a href="${u('/privacy/')}">Privacy</a></nav>
 <p>Family data from <a href="https://www.wikidata.org/">Wikidata</a> (CC0). Portraits from <a href="https://commons.wikimedia.org/">Wikimedia Commons</a>, credited on each page. Wikidata can contain errors – <a href="${u('/about/#corrections')}">how to correct them</a>.</p>
 </div></footer>
 ${scripts}
@@ -488,12 +488,112 @@ ${trees.map((T) => `<h3>${esc(treeName(T))}</h3><ul class="plist">${T.nodes.filt
 <p class="lede">Royal houses, ancient dynasties, presidents’ families and the gods of myth – ${pageIds.size.toLocaleString('en')} people, linked parent to child. Zoom, tap and follow any branch, on your phone or in print.</p>
 <p><a class="btn primary" href="${u('/british-royal-family/')}">British royal family tree</a> <a class="btn" href="${u('/trees/')}">All ${trees.length} trees</a></p></div>${heroArt}</section>
 <section class="finder-box"><h2>How are they related?</h2><p>Queen Victoria and Nicholas II? Zeus and Heracles? Pick two people and see the family path between them.</p>${finderForm()}<div id="result" aria-live="polite"></div></section>
+<section class="finder-box"><h2>Make your own family tree</h2><p>Fill in your parents, grandparents and great-grandparents online, then print it or save it as a PDF. Free, no sign-up – nothing leaves your device.</p><p><a class="btn primary" href="${u('/make-your-own-family-tree/')}">Start your family tree</a> <a class="btn" href="${u('/family-tree-template/')}">Printable blank templates</a></p></section>
 <h2>Popular family trees</h2><div class="grid">${feat.map(treeCard).join('')}</div>
 ${Object.entries(CAT).map(([c, h]) => { const ts = trees.filter((T) => T.t.cat === c && !feat.includes(T)); return ts.length ? `<h2>${h}</h2><div class="grid">${ts.map(treeCard).join('')}</div>` : ''; }).join('')}
 <h2>Surprising relationships</h2><ul>${pairPages.slice(0, 12).map(pairLink).join('')}</ul>
 </div>`;
   await write('/', layout({ title: 'FamilyTreeOf – Interactive Family Trees of Royals, Dynasties & Gods', desc: 'Interactive family trees of the British royal family, Tudors, Habsburgs, Romanovs, Roman emperors, pharaohs and Greek, Norse and Egyptian gods. Free, mobile-friendly, printable.', path: '/', body, scripts: finderScript, jsonld: [{ '@context': 'https://schema.org', '@type': 'WebSite', name: SITE, url: BASE + '/' }] }));
   sitemap.push('/');
+}
+
+// ---------- Lag ditt eget tre + utskriftbare maler ----------
+const pedLabel = (n) => {
+  if (n === 1) return 'You';
+  const k = Math.floor(Math.log2(n)), male = n % 2 === 0;
+  if (k === 1) return male ? 'Father' : 'Mother';
+  if (k === 2) return (n < 6 ? 'Paternal ' : 'Maternal ') + (male ? 'grandfather' : 'grandmother');
+  return 'Great-' + 'great-'.repeat(k - 3) + (male ? 'grandfather' : 'grandmother');
+};
+function blankPedigree(G) {
+  const R = 2 ** (G - 1);
+  let h = '';
+  for (let k = 0; k < G; k++) {
+    const span = R / 2 ** k;
+    for (let i = 0; i < 2 ** k; i++) {
+      const n = 2 ** k + i;
+      const side = k === 0 ? '' : n % 2 === 0 ? ' fa' : ' mo';
+      const sex = k === 0 ? '' : n % 2 === 0 ? ' male' : ' female';
+      const lines = G === 5 && k === 4 ? '<span class="ln"></span>' : `<span class="ln"></span><span class="ln"><small>b.</small></span>${k < 3 ? '<span class="ln"><small>d.</small></span>' : ''}`;
+      h += `<div class="pn g${k}${side}" style="grid-column:${k + 1};grid-row:${i * span + 1} / span ${span}"><div class="box${sex}"><span class="lbl">${pedLabel(n)}</span>${lines}</div></div>`;
+    }
+  }
+  return `<div class="ped-scroll"><div class="ped" style="--g:${G};--rows:${R};grid-template-columns:repeat(${G},minmax(0,1fr));grid-template-rows:repeat(${R},minmax(${G === 5 ? 46 : 62}px,auto))">${h}</div></div>`;
+}
+const TMPL = [
+  { g: 3, slug: '3-generations', people: 7, who: 'you, your parents and your four grandparents', use: 'school projects and young children' },
+  { g: 4, slug: '4-generations', people: 15, who: 'you, your parents, grandparents and eight great-grandparents', use: 'most families – it fits comfortably on one page' },
+  { g: 5, slug: '5-generations', people: 31, who: 'you and four generations of ancestors, up to sixteen great-great-grandparents', use: 'genealogy research and family history projects' },
+];
+const makerPath = '/make-your-own-family-tree/';
+const tmplPath = '/family-tree-template/';
+{
+  const path = makerPath;
+  const faq = [
+    ['Is this family tree maker free?', 'Yes. You can fill in, print and save your family tree as a PDF for free. There is no account and no sign-up.'],
+    ['Where are the names stored?', 'Only in your own browser (local storage on this device). Nothing you type is sent to us or anyone else. If you clear your browser data or switch device, the tree is gone – so print it or save it as a PDF.'],
+    ['How do I save my family tree as a PDF?', 'Click “Print or save as PDF” and choose “Save as PDF” (or “Microsoft Print to PDF”) as the printer. The chart is laid out for one landscape page.'],
+    ['How many generations should I choose?', 'Three generations (7 people) suits school projects. Four generations (15 people) is the classic family tree. Five generations (31 people) goes back to your great-great-grandparents, usually to the 1800s.'],
+    ['What should I write in the dates field?', 'A common style is “b. 1932, Leeds – d. 2011”. Write what you know – a year alone, or “c. 1890” for an estimate, is fine.'],
+  ];
+  const body = `<div class="wrap ped-page" id="maker">${crumbs([['Home', '/'], ['Make your own family tree', path]])}
+<h1>Make your own family tree</h1>
+<p class="lede">Fill in your family tree right here – you, your parents, grandparents and great-grandparents. Free, no sign-up, and nothing leaves your device. Print it or save it as a PDF when you are done.</p>
+<div class="ped-acts"><span class="seg" role="group" aria-label="Generations"><button type="button" data-g="3" aria-pressed="false">3 generations</button><button type="button" data-g="4" aria-pressed="true">4</button><button type="button" data-g="5" aria-pressed="false">5</button></span>
+<button type="button" class="btn primary" data-print>Print or save as PDF</button><button type="button" class="btn" data-clear>Clear</button><span class="saved" data-status aria-live="polite"></span></div>
+<div class="ped-sheet"><input class="ped-title" data-title placeholder="The … Family Tree" aria-label="Title of your family tree" maxlength="80"><div class="ped-scroll"><div class="ped" data-chart></div></div>
+<noscript><p>The family tree maker needs JavaScript. You can <a href="${u(tmplPath)}">print a blank family tree template</a> instead.</p></noscript></div>
+<p class="muted">Tip: on a phone, swipe sideways to reach the older generations. Your entries are saved automatically in this browser.</p>
+<h2>How to make a family tree</h2>
+<ol><li><b>Start with yourself</b> in the box on the left, then add your father and mother.</li>
+<li><b>Work backwards</b> one generation at a time. Fathers are always the upper box of each pair, mothers the lower – write mothers under their birth (maiden) names.</li>
+<li><b>Ask relatives</b> while you can. Grandparents often remember names and places that are in no record.</li>
+<li><b>Check documents:</b> birth, marriage and death certificates, census records, gravestones and family Bibles.</li>
+<li><b>Print it</b> or save it as a PDF and share it with the family.</li></ol>
+<h2>Prefer pen and paper?</h2>
+<p>Print a <a href="${u(tmplPath)}">blank family tree template</a>: ${TMPL.map((t) => `<a href="${u(tmplPath + t.slug + '/')}">${t.g} generations</a>`).join(', ')}.</p>
+<h2>Questions</h2>${faq.map(([q, a]) => `<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join('')}
+<h2>See famous family trees</h2><p>Need inspiration? Explore the <a href="${u('/british-royal-family/')}">British royal family tree</a>, the <a href="${u('/tudor/')}">Tudors</a> or the <a href="${u('/greek-gods/')}">Greek gods</a>.</p>
+</div>`;
+  const ld = [crumbLd([['Home', '/'], ['Make your own family tree', path]]),
+    { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Family tree maker', url: BASE + path, applicationCategory: 'LifestyleApplication', operatingSystem: 'Any (web browser)', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } },
+    { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }];
+  await write(path, layout({ title: 'Make Your Own Family Tree – Free Family Tree Maker, Print or PDF', desc: 'Free family tree maker: fill in your parents, grandparents and great-grandparents online, then print it or save it as a PDF. No sign-up – your data stays on your device.', path, body, nav: 'maker', jsonld: ld, scripts: `<script src="${u('/js/maker.js')}?v=${VERSION}" defer></script>` }));
+  sitemap.push(path);
+}
+{
+  const path = tmplPath;
+  const body = `<div class="wrap">${crumbs([['Home', '/'], ['Family tree templates', path]])}
+<h1>Free printable family tree templates</h1>
+<p class="lede">Blank family tree charts to print and fill in by hand – for school projects, family gatherings and genealogy research. Each fits on one landscape A4 or US Letter page. Free, no sign-up.</p>
+<ul class="tmpl-list">${TMPL.map((t) => `<li><a href="${u(path + t.slug + '/')}"><b>${t.g}-generation family tree</b><small>${t.people} people · ${esc(t.who)}</small></a></li>`).join('')}</ul>
+<h2>Fill it in online instead</h2>
+<p>With our <a href="${u(makerPath)}">family tree maker</a> you type the names straight into the chart, and print it or save it as a PDF when you are done. Nothing is uploaded – it stays in your browser.</p>
+<h2>Which template should I choose?</h2>
+${TMPL.map((t) => `<p><b><a href="${u(path + t.slug + '/')}">${t.g} generations</a></b> covers ${esc(t.who)} (${t.people} boxes). Good for ${esc(t.use)}.</p>`).join('')}
+<h2>How to read a family tree chart</h2>
+<p>These templates are <i>ancestor charts</i> (also called pedigree charts). You start on the left, and each person’s father is in the upper box and mother in the lower box to the right. Genealogists write women under their birth (maiden) names, so each family line can be followed back.</p>
+<p>Want to see a finished family tree? Look at the <a href="${u('/british-royal-family/')}">British royal family tree</a> or the <a href="${u('/greek-gods/')}">Greek gods family tree</a>.</p>
+</div>`;
+  await write(path, layout({ title: 'Free Printable Family Tree Templates (3, 4 and 5 Generations)', desc: 'Free printable family tree templates: blank 3, 4 and 5 generation charts for school projects and genealogy. Print on one page, or fill them in online and save as PDF.', path, body, nav: 'maker', jsonld: [crumbLd([['Home', '/'], ['Family tree templates', path]])] }));
+  sitemap.push(path);
+  for (const t of TMPL) {
+    const p2 = path + t.slug + '/';
+    const cr = [['Home', '/'], ['Family tree templates', path], [`${t.g} generations`, p2]];
+    const others = TMPL.filter((x) => x !== t).map((x) => `<a href="${u(path + x.slug + '/')}">${x.g} generations</a>`).join(' · ');
+    const b2 = `<div class="wrap ped-page">${crumbs(cr)}
+<h1>${t.g}-generation family tree template</h1>
+<p class="lede">A blank ${t.g}-generation family tree with ${t.people} boxes: ${esc(t.who)}. Print it on one landscape page and fill it in by hand.</p>
+<p class="ped-acts"><button type="button" class="btn primary" onclick="window.print()">Print this template</button> <a class="btn" href="${u(makerPath + '?generations=' + t.g)}">Fill it in online</a></p>
+<div class="ped-sheet"><p class="ped-title">The ______________ Family Tree</p>${blankPedigree(t.g)}</div>
+<p class="muted">Printing tip: choose landscape and “fit to page”. To save it as a PDF, pick “Save as PDF” as the printer. On a phone, swipe sideways to see the whole chart.</p>
+<h2>How to fill in the template</h2>
+<p>Write your own name in the box on the left. Your father goes in the upper box to the right and your mother in the lower box, and so on for each generation. Write “b.” for born and “d.” for died, with the year and place if you know them. Women are usually written under their birth (maiden) names.</p>
+<p>Other sizes: ${others}. Or use the <a href="${u(makerPath)}">online family tree maker</a>.</p>
+</div>`;
+    await write(p2, layout({ title: `${t.g} Generation Family Tree Template – Free Printable`, desc: `Free printable ${t.g}-generation family tree template with ${t.people} boxes: ${t.who}. Blank, one page, ready to print – or fill it in online.`, path: p2, body: b2, nav: 'maker', jsonld: [crumbLd(cr)] }));
+    sitemap.push(p2);
+  }
 }
 
 // ---------- Om, personvern, 404 ----------
@@ -520,6 +620,7 @@ ${Object.entries(CAT).map(([c, h]) => { const ts = trees.filter((T) => T.t.cat =
 <p>FamilyTreeOf has no user accounts, no forms and no advertising. We do not use cookies.</p>
 <p>${GOAT ? 'We count page views with <a href="https://www.goatcounter.com/">GoatCounter</a>, a privacy-friendly analytics service. It does not use cookies, does not store IP addresses and does not track you across websites.' : 'We do not run any analytics at the moment. If we add privacy-friendly page view counting (without cookies) in the future, this page will say so.'}</p>
 <p>All family trees and the relationship finder run in your browser. The names you search for are not sent anywhere.</p>
+<p>The family tree maker stores what you type only in your own browser (local storage on your device). It is never sent to us. You can delete it with the “Clear” button or by clearing your browser data.</p>
 <p>The site is hosted on GitHub Pages, which may log technical information such as IP addresses for security purposes. See <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub’s privacy statement</a>.</p>
 <p>The people in our family trees are historical figures, mythological figures or living public figures. Read <a href="${u('/about/')}">how we handle living people</a>.</p>
 </div>`;

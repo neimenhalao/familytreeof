@@ -201,3 +201,52 @@ a.pc:hover { border-color: var(--gold-2); color: var(--ink); }
   .sheet { right: 8px; left: 8px; width: auto; bottom: 8px; }
   .tree-head .no-print { display: none; }
 }
+
+/* ---------- Pedigree: blank templates + maker ---------- */
+.ped-sheet { background: var(--card); border: 1px solid var(--paper-2); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 14px; margin: 18px 0; }
+.ped-title { text-align: center; font-family: var(--serif); font-size: 1.5rem; font-weight: 600; margin: 0 0 12px; }
+input.ped-title { display: block; width: 100%; border: 0; border-bottom: 1px dashed var(--line); background: transparent; color: var(--ink); padding: 4px; }
+.ped-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ped { display: grid; grid-auto-flow: column; min-width: calc(var(--g) * 150px); }
+.ped .pn { position: relative; display: flex; align-items: center; padding: 3px 0 3px 16px; min-height: 40px; }
+.ped .pn.g0 { padding-left: 0; }
+.ped .pn:not(.g0)::before { content: ""; position: absolute; left: 0; top: 50%; width: 16px; border-top: 2px solid var(--line); }
+.ped .pn.fa::after, .ped .pn.mo::after { content: ""; position: absolute; left: 0; border-left: 2px solid var(--line); }
+.ped .pn.fa::after { top: 50%; bottom: 0; }
+.ped .pn.mo::after { top: 0; bottom: 50%; }
+.ped .box { width: 100%; border: 1.5px solid var(--line); border-radius: 8px; background: #fff; padding: 4px 8px 6px; min-width: 0; }
+.ped .box.male { border-color: var(--male); }
+.ped .box.female { border-color: var(--female); }
+.ped .lbl { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-3); line-height: 1.3; }
+.ped .ln { display: block; border-bottom: 1px solid #cfc6b2; height: 1.45em; }
+.ped .ln small { font-size: .68rem; color: var(--ink-3); }
+.ped input { display: block; width: 100%; border: 0; border-bottom: 1px solid #e3dccb; background: transparent; font: inherit; color: var(--ink); padding: 1px 0; min-width: 0; }
+.ped input.nm { font-weight: 600; font-size: .95rem; }
+.ped input.dt { font-size: .82rem; color: var(--ink-2); }
+.ped input:focus { outline: none; border-bottom-color: var(--focus); }
+.ped-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+.ped-acts .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.ped-acts .seg button { border: 0; background: var(--card); padding: 8px 14px; font: inherit; font-size: .9rem; cursor: pointer; color: var(--ink); }
+.ped-acts .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.ped-acts .saved { font-size: .85rem; color: var(--ink-3); }
+.tmpl-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; padding: 0; list-style: none; }
+.tmpl-list a { display: block; background: var(--card); border: 1px solid var(--paper-2); border-radius: var(--radius); padding: 14px 16px; text-decoration: none; color: var(--ink); box-shadow: var(--shadow); }
+.tmpl-list a b { display: block; font-family: var(--serif); font-size: 1.1rem; }
+.tmpl-list a small { color: var(--ink-3); }
+@media print {
+  @page { size: landscape; margin: 10mm; }
+  .wrap.ped-page > *:not(.ped-sheet) { display: none !important; }
+  .ped-sheet { border: 0; box-shadow: none; padding: 0; margin: 0; }
+  .ped-scroll { overflow: visible; }
+  .ped { min-width: 0; height: 180mm; grid-template-rows: repeat(var(--rows), 1fr) !important; }
+  .ped .pn { min-height: 0; padding-top: 1px; padding-bottom: 1px; }
+  .ped .box { padding: 2px 6px 3px; }
+  .ped .lbl { font-size: 6.5pt; }
+  .ped .ln { height: 1.25em; }
+  .ped input { border-bottom: 0; }
+  .ped input::placeholder, input.ped-title::placeholder { color: transparent; }
+  input.ped-title { border: 0; }
+  .ped .box, .ped .pn::before, .ped .pn::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+.top nav a { white-space: nowrap; }
+@media (max-width: 400px) { .top .wrap { gap: 10px; } .top nav { gap: 9px; font-size: .82rem; } .brand { font-size: 1rem; } .brand svg { width: 24px; height: 24px; } }
