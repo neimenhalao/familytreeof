@@ -1,0 +1,14 @@
+{
+  "name": "familytreeof",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fetch": "node tools/fetch.mjs",
+    "images": "node tools/images.mjs",
+    "build": "node tools/build.mjs",
+    "serve": "node tools/serve.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.1"
+  }
+}
