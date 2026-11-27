@@ -112,7 +112,7 @@ export const INTROS = {
     lede: 'The “father-in-law of Europe” and the Danish monarchs who followed him.',
     intro: [
       '<p>Christian IX was King of Denmark from 1863 to 1906. With his wife, Louise of Hesse-Kassel, he had children who married or reigned across Europe. Alexandra married Edward VII of the United Kingdom, Dagmar became Empress Maria Feodorovna of Russia, and George became King of the Hellenes. These links earned Christian IX the nickname <em>“father-in-law of Europe”</em>.</p>',
-      '<p>In Denmark the crown passed to Frederick VIII, Christian X, Frederick IX and <strong>Margrethe II</strong>. She abdicated, and her son became King <strong>Frederik X</strong> on 14 January 2024. Crown Prince Christian is his heir. A grandson of Christian IX, Prince Carl, became King Haakon VII of Norway in 1905.</p>',
+      '<p>In Denmark the crown passed to Frederick VIII, Christian X, Frederik IX and <strong>Margrethe II</strong>. She abdicated, and her son became King <strong>Frederik X</strong> on 14 January 2024. Crown Prince Christian is his heir. A grandson of Christian IX, Prince Carl, became King Haakon VII of Norway in 1905.</p>',
       '<p>This Danish royal family tree shows those connections. Tap anyone to see their parents, spouses and children.</p>',
     ],
     faq: [
