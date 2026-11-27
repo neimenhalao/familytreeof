@@ -37,6 +37,6 @@ await make('site/og.png', 'Family trees of history', 'Royals, dynasties, preside
 for (const t of TREES) {
   const ids = Object.entries(M[t.slug] || {}).sort((a, b) => a[1][0] - b[1][0]).map(([id]) => id).filter((id) => IMG[id] && existsSync(`site${IMG[id].m}`));
   const h1 = INTROS[t.slug]?.h1 || t.name;
-  await make(`site/og/${t.slug}.png`, h1, `${Object.keys(M[t.slug] || {}).length} people · tap any name to explore`, ids.map((id) => IMG[id].m));
+  await make(`site/og/${t.slug}.png`, h1, 'Interactive family tree · tap any name to explore', ids.map((id) => IMG[id].m));
 }
 console.log('OG-bilder laget');

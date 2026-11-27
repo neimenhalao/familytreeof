@@ -56,7 +56,8 @@ git add -A && git commit -m "…" && git push               # publiserer
 6. **Rapport til COO** (kort, norsk): tall, hva som ble gjort, neste steg, og bare om det trengs: hva eieren må gjøre.
 
 ## Status
-- 2026-11-27: **MVP live på github.io med NOINDEX.** Se tallene i siste byggelinje (`node tools/build.mjs`). Venter på at eieren kjøper familytreeof.com og lager GoatCounter-kontoen. Ved lansering: sett `SITE_DOMAIN`, legg til custom domain i Pages, sett DNS, fjern `NOINDEX`, legg sitemap inn i Search Console, sjekk at IndexNow svarer 200/202.
+- 2026-11-27: **MVP live på github.io med NOINDEX.** 26 trær (kongehus i dag, dynastier, antikken, mytologi, amerikanske familier), 7 613 personsider (4 054 indekserbare, resten `noindex`), 103 «How are X and Y related?»-sider, søkergraf med 11 613 personer, 3 875 portretter med fri lisens og 124 levende personer utelatt etter regelen. Data hentet 2026-11-27 (14 235 Wikidata-entiteter, ca. 470 SPARQL-spørringer totalt). Bygget tar ca. 4 min lokalt (OneDrive-I/O), under 1 min i Actions. Testet i nettleser på mobil (375 px) og desktop. Venter på at eieren kjøper familytreeof.com og lager GoatCounter-kontoen.
+- Kjente svakheter: mytologitrærne er brede og rotete fordi Wikidata har mange varianter (Zeus har mange partnere). Slektskap utenfor trærne kan mangle fordi grafen bare har trærne + nærmeste familie, så det kan stå «not related by blood» der et fjernt blodsslektskap finnes. Grafen (`data/graph.json`) er ca. 1 MB ukomprimert og lastes først når søkeren tas i bruk. Ved lansering: sett `SITE_DOMAIN`, legg til custom domain i Pages, sett DNS, fjern `NOINDEX`, legg sitemap inn i Search Console, sjekk at IndexNow svarer 200/202.
 
 ## Lansering (når domenet er kjøpt)
 1. Eier: kjøper familytreeof.com (Domeneshop) og legger inn DNS: 4 A-oppføringer (185.199.108–111.153) + `www` CNAME `neimenhalao.github.io`, og Google-TXT for Search Console (domeneegenskap).

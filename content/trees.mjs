@@ -26,9 +26,9 @@ export const TREES = [
   { slug: 'ptolemaic-dynasty', name: 'Ptolemaic dynasty', cat: 'ancient', roots: ['Q168261'], houses: ['Q131976'], houseless: true, depth: 14, max: 220, focus: ['Q635'] },
   { slug: 'tutankhamun', name: 'Tutankhamun and the 18th Dynasty', cat: 'ancient', roots: ['Q7222'], houses: ['Q146055'], houseless: true, depth: 14, max: 220, focus: ['Q12154'] },
   // Mytologi
-  { slug: 'greek-gods', name: 'Greek gods', cat: 'myth', roots: ['Q131090'], follow: 'all', depth: 5, max: 2400, focus: ['Q34201'] },
-  { slug: 'norse-gods', name: 'Norse gods', cat: 'myth', roots: ['Q336145', 'Q1396283', 'Q193879'], follow: 'all', depth: 6, max: 220, focus: ['Q43610'] },
-  { slug: 'egyptian-gods', name: 'Egyptian gods', cat: 'myth', roots: ['Q276563'], follow: 'all', depth: 6, max: 160, focus: ['Q46491'] },
+  { slug: 'greek-gods', name: 'Greek gods', cat: 'myth', roots: ['Q131090'], wikiOnly: true, follow: 'all', depth: 5, max: 2400, focus: ['Q34201'] },
+  { slug: 'norse-gods', name: 'Norse gods', cat: 'myth', roots: ['Q336145', 'Q1396283', 'Q193879'], wikiOnly: true, follow: 'all', depth: 6, max: 220, focus: ['Q43610'] },
+  { slug: 'egyptian-gods', name: 'Egyptian gods', cat: 'myth', roots: ['Q276563'], wikiOnly: true, follow: 'all', depth: 6, max: 160, focus: ['Q46491'] },
   // Amerikanske presidentfamilier og kjente slekter
   { slug: 'adams-family', name: 'Adams family', cat: 'family', roots: ['Q11806'], follow: 'all', depth: 4, max: 120, focus: ['Q11816'] },
   { slug: 'harrison-family', name: 'Harrison family', cat: 'family', roots: ['Q387664'], follow: 'all', depth: 5, max: 120, focus: ['Q35678'] },

@@ -74,9 +74,12 @@ export function blood(K, a, b) {
 export function anyPath(K, a, b, maxCost = 24) {
   const dist = new Map([[a, 0]]), prev = new Map();
   const heap = [[0, a]];
+  const push = (it) => { heap.push(it); let i = heap.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+  const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } } return top; };
+  let pops = 0;
   while (heap.length) {
-    heap.sort((x, y) => x[0] - y[0]);
-    const [d, x] = heap.shift();
+    const [d, x] = pop();
+    if (++pops > 60000) break;
     if (x === b) break;
     if (d > (dist.get(x) ?? Infinity) || d > maxCost) continue;
     const edges = [];
@@ -85,9 +88,8 @@ export function anyPath(K, a, b, maxCost = 24) {
     for (const s of K.spouses[x]) edges.push([s, 'sp', 1.6]);
     for (const [y, t, c] of edges) {
       const nd = d + c;
-      if (nd < (dist.get(y) ?? Infinity)) { dist.set(y, nd); prev.set(y, [x, t]); heap.push([nd, y]); }
+      if (nd < (dist.get(y) ?? Infinity)) { dist.set(y, nd); prev.set(y, [x, t]); push([nd, y]); }
     }
-    if (heap.length > 20000) break;
   }
   if (!prev.has(b)) return null;
   const steps = []; let c = b;

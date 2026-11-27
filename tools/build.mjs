@@ -6,7 +6,7 @@ import { dirname } from 'node:path';
 import { TREES, LIVING_ALLOW, BLOCK } from '../content/trees.mjs';
 import { INTROS } from '../content/intros.mjs';
 import { PAIRS } from '../content/pairs.mjs';
-import { prepare, explain } from '../site/js/kin.js';
+import { prepare, explain, blood } from '../site/js/kin.js';
 
 const DOMAIN = process.env.SITE_DOMAIN || 'neimenhalao.github.io';
 const BP = (process.env.BASE_PATH ?? (DOMAIN.endsWith('github.io') ? '/familytreeof' : '')).replace(/\/$/, '');
@@ -126,7 +126,7 @@ const pageIds = new Set();
 const treesOf = new Map();
 for (const t of TREES) {
   const mem = M[t.slug] || {};
-  const cand = new Set(Object.keys(mem).filter((id) => P.has(id)));
+  const cand = new Set(Object.keys(mem).filter((id) => P.has(id) && (!t.wikiOnly || P.get(id).e.wiki || t.roots.includes(id))));
   const k = {}, h = {}, cp = {}, pa = {}, dep = {};
   // barn vises bare under sine hovedforeldre (sikre lenker); varianter står på personsiden
   const kidsOf = (id) => (mem[id] && mem[id][1] ? R.children(id).filter((c) => cand.has(c) && mainParents(c).includes(id)) : []);
@@ -146,6 +146,19 @@ for (const t of TREES) {
       }
     }
     q = nq;
+  }
+  // hjemmeforelder: medlem av huset først, deretter far (barn vises fullt under ham, som henvisning hos den andre)
+  {
+    const houses = t.houses || [];
+    const prio = (id) => (E[id].P53.some((x) => houses.includes(x)) ? 2 : 0) + (P.get(id).sex === 'm' ? 1 : 0);
+    const parentsIn = new Map();
+    for (const [p, ks] of Object.entries(k)) for (const c of ks) { if (!parentsIn.has(c)) parentsIn.set(c, []); parentsIn.get(c).push(p); }
+    const isAnc = (c, p) => { let x = p, g = 0; while (x && g++ < 200) { if (x === c) return true; x = h[x]; } return false; };
+    for (const [c, ps] of parentsIn) {
+      if (ps.length < 2 || !h[c]) continue;
+      const best = ps.filter((p) => !isAnc(c, p)).sort((x, y) => prio(y) - prio(x))[0];
+      if (best && prio(best) > prio(h[c])) h[c] = best;
+    }
   }
   const nodes = Object.keys(dep);
   const nodeSet = new Set(nodes);
@@ -348,7 +361,7 @@ for (const id of pageIds) {
   const stmts = [];
   if (T0) {
     const targets = [...T0.t.roots, ...(T0.t.focus || [])].filter((x) => x !== id && P.has(x) && K.idx.has(x));
-    for (const x of targets.slice(0, 3)) { const r = explain(K, id, x); if (r.ok && r.steps > 1) stmts.push(r.lines[r.main]); }
+    for (const x of targets.slice(0, 3)) { const bl = K.idx.has(id) && blood(K, K.idx.get(id), K.idx.get(x)); if (bl && bl.s > 1) { const r = explain(K, id, x); if (r.ok) stmts.push(r.lines[r.main]); } }
   }
   const varP = e.P22.length > 1 || e.P25.length > 1;
   const uncP = parents.filter((x) => unc.has(x + '>' + id));

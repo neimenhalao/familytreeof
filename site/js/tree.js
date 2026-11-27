@@ -40,7 +40,7 @@
     open = new Set();
     const total = Object.keys(D.dep).length;
     for (const [id, dep] of Object.entries(D.dep)) if (D.k[id] && (total <= 40 || dep < (D.open ?? 1))) open.add(id);
-    for (const f of D.focus || []) { revealPath(f); if (D.k[f]) { open.add(f); for (const c of D.k[f]) if (D.k[c]) open.add(c); } }
+    for (const f of D.focus || []) { revealPath(f); if (D.k[f]) { open.add(f); if (total < 400) for (const c of D.k[f]) if (D.k[c]) open.add(c); } }
   }
   function revealPath(id) {
     let cur = D.h[id], guard = 0;
